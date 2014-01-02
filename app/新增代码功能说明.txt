@@ -1,0 +1,13 @@
+相对原DEMO新加入的线程
+ITS_ImgMain       	      图像处理系统线程
+ITS_AlgorithmFunc.c           算法文件（含背景建模算法、队列检测算法）
+ITS_ReceiveCmd.c              接收后台控制端信号Socket线程
+__________
+RConfig_UdpListen.c           和远程配置平台UDP广播通信
+RConfig_ConfigMain.c          接收远程配置平台的命令和配置
+Rconfig_SendYuvData.c         向远程配置平台发送原始图像数据
+__________
+RServer_SendRoadInf.c	      向远程服务器发送消息
+
+****************************************************
+更新日期：2013年12月31日

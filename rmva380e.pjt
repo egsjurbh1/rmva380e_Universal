@@ -1,0 +1,84 @@
+; Code Composer Project File, Version 2.0 (do not modify or remove this line)
+
+[Project Settings]
+ProjectDir="E:\Lab217\EagleEye3\DEMO\380E\rmva380e_Universal\"
+ProjectType=Executable
+CPUFamily=TMS320C64XX
+Tool="Compiler"
+Tool="CustomBuilder"
+Tool="DspBiosBuilder"
+Tool="Linker"
+Config="Debug"
+Config="Release"
+
+[Source Files]
+Source="app\EE3_ENCDataAcq.c"
+Source="app\EE3_Encryption.c"
+Source="app\EE3_gelcmd.c"
+Source="app\EE3_GlobalVariables.c"
+Source="app\EE3_ImgAcq.c"
+Source="app\EE3_imgprocess.c"
+Source="app\EE3_JPGEncoder.c"
+Source="app\EE3_main.c"
+Source="app\EE3_NetLinkStatus.c"
+Source="app\EE3_NetWorkMain.c"
+Source="app\EE3_pio.c"
+Source="app\EE3_SendFconData.c"
+Source="app\EE3_SendLiveStreamData.c"
+Source="app\EE3_SendLiveStreamData_Another.c"
+Source="app\EE3_SendSDFSData.c"
+Source="app\EE3_SendTrgData.c"
+Source="app\EE3_uart_process.c"
+Source="app\EE3_Version.c"
+Source="app\H264MediaSourceLiveDsp.c"
+Source="app\ITS_AlgorithmFunc.c"
+Source="app\ITS_ImgMain.c"
+Source="app\ITS_ReceiveCmd.c"
+Source="app\RConfig_ConfigMain.c"
+Source="app\RConfig_SendYuvData.c"
+Source="app\RConfig_UdpListen.c"
+Source="app\RServer_SendRoadInf.c"
+Source="app\rtspMain.c"
+Source="EE3.tcf"
+Source="lib\dmjpge_tigem.l64P"
+Source="lib\hal_eth_stub.lib"
+Source="lib\hal_ser_stub.lib"
+Source="lib\hal_timer_bios.lib"
+Source="lib\hal_userled_stub.lib"
+Source="lib\miniPrintf.lib"
+Source="lib\netctrl.lib"
+Source="lib\nettool.lib"
+Source="lib\os.lib"
+Source="lib\rmva380e_lib.lib"
+Source="lib\roseek_ee3_rtsp.lib"
+Source="lib\stack.lib"
+Source="EE3.cmd"
+
+[Generated Files]
+Source="EE3cfg.s62"
+Source="EE3cfg_c.c"
+
+["Compiler" Settings: "Debug"]
+Options=-g -pdsw225 -o3 -fr"$(Proj_dir)\Debug" -i"$(Proj_dir)\inc_rtsp" -i"$(Proj_dir)\" -i"$(Proj_dir)\inc" -i"$(Proj_dir)\inc_cslr" -i"$(Proj_dir)\inc_dev" -i"$(Proj_dir)\inc_stack" -i"$(Proj_dir)\inc_eth" -i"$(Proj_dir)\include" -d"_DEBUG" -d"CHIP_DM648" -mv6400+
+
+["Compiler" Settings: "Release"]
+Options=-pdsw225 -o3 -fr"$(Proj_dir)\Release" -i"$(Proj_dir)\inc_rtsp" -i"$(Proj_dir)\" -i"$(Proj_dir)\inc" -i"$(Proj_dir)\inc_cslr" -i"$(Proj_dir)\inc_dev" -i"$(Proj_dir)\inc_stack" -i"$(Proj_dir)\inc_eth" -i"$(Proj_dir)\include" -d"CHIP_DM648" -mv6400+
+
+["DspBiosBuilder" Settings: "Debug"]
+Options=-Dconfig.importPath="$(Install_dir)\bios_5_41_04_18\packages;"
+
+["DspBiosBuilder" Settings: "Release"]
+Options=-Dconfig.importPath="$(Install_dir)\bios_5_41_04_18\packages;"
+
+["Linker" Settings: "Debug"]
+Options=-c -m".\Debug\rmva380e.map" -o".\Debug\rmva380e.out" -w -x
+
+["Linker" Settings: "Release"]
+Options=-q -c -m".\Release\rmva380e.map" -o".\Release\rmva380e.out" -w -x
+
+["EE3.cmd" Settings: "Debug"]
+LinkOrder=1
+
+["EE3.cmd" Settings: "Release"]
+LinkOrder=1
+

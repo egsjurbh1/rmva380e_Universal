@@ -1,0 +1,113 @@
+///////////////////////////////////////////////////////////////////////
+// File name: EagleEye3.gel											 //    
+///////////////////////////////////////////////////////////////////////
+
+StartUp()
+{
+	GEL_ProjectLoad( "rmva380e.pjt");
+}
+
+init_2()
+{
+	*(int*)0x78000008 = (0x00d38832);
+	*(int*)0x7800000C = 0x0000081e;
+	*(int*)0x78000010 = 0x66db5b99;
+	*(int*)0x78000014 = 0x00a4C722;
+	*(int*)0x780000E4 = 0x50006405;
+	*(int*)0x78000008 = (0x00538832);
+
+}
+
+
+int _GEL_Global_Timeout1 = 0;
+#define TIMEOUT_ID 10
+
+init_1( int pm )
+{
+	*(unsigned int*)0x020E0100 &= 0xFFFFFFDF;
+	*(unsigned int*)0x020E0100 &= 0xFFFFFFFE;
+	Wait_Soft(150);
+	*(unsigned int*)0x020E0100 |= 0x8;
+	if ((*(unsigned int*)0x020E0100 & 0x00000002) !=0 )
+	{
+		*(unsigned int*)0x020E0100 |= 0x00000010;
+		*(unsigned int*)0x020E0100 &= 0xFFFFFFFD;
+		*(unsigned int*)0x020E0100 &= 0xFFFFFFEF;
+		Wait_Soft(5000);
+	}
+	else
+	{
+		*(unsigned int*)0x020E0100 &= 0xFFFFFFEF;
+	}
+	*(unsigned int*)0x020E0110 = (pm-1);
+	*(unsigned int*)0x020E0138 |= 0x00000001;
+	Set_Timeout(1000);
+	while( Get_Timeout() && (*(unsigned int*)0x020E013C & 0x01) !=0 );
+	if (!Get_Timeout())
+	{
+		GEL_TextOut( "Timeout Error #01!\n",,2,,,);
+	}
+	Kill_Timeout();
+	Wait_Soft(160);
+	*(unsigned int*)0x020E0100 &= 0xFFFFFFF7;
+	Wait_Soft(2500);
+	*(unsigned int*)0x020E0100 |= 0x00000001;
+}
+
+Wait_Soft( int nloop )
+{
+	int i;
+	for( i = 0 ; i < nloop ; i++ )
+	{
+	}
+}
+
+Set_Timeout(msec)
+{
+    GEL_CancelTimer(TIMEOUT_ID);
+
+    _GEL_Global_Timeout1=1;
+
+    GEL_SetTimer(msec, TIMEOUT_ID, "_Timeout_Callback()");
+}
+
+Get_Timeout()
+{
+    if (!_GEL_Global_Timeout1)
+    {
+        GEL_CancelTimer(TIMEOUT_ID);
+    }
+
+    return _GEL_Global_Timeout1;
+}
+
+Set_Wait(msec)
+{
+    Wait_Soft(msec*40);
+}
+
+Kill_Timeout()
+{
+    GEL_CancelTimer(TIMEOUT_ID);
+
+    _GEL_Global_Timeout1=0;
+}
+
+menuitem "Load Program";
+hotmenu Load_Program()
+{
+	int i;
+
+	GEL_Reset();
+	for( i=0; i<10000; i++)	i=i;
+	init_1(20);
+	for( i=0; i<10000; i++)	i=i;
+	init_2();
+	//for( i=0; i<10000; i++)	i=i;
+	GEL_ProjectLoad( "rmva380e.pjt");
+	//for( i=0; i<10000; i++)	i=i;
+	GEL_Load( "Debug/rmva380e.out");
+	//for( i=0; i<10000; i++)	i=i;
+	//GEL_Go( main);
+}
+
