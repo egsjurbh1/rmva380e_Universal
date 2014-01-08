@@ -196,7 +196,7 @@ volatile Bool IsReadFlash = TRUE;//是否从Flash中读取相机运行参数（默认开启）
 //相机当前状态参数
 EE3_StateStruct g_EE3State = 
 {
-	"rmva380e_Universal_V0.28",		//主程序版本号
+	"rmva380e_Universal_V0.29",		//主程序版本号
 	1								//相机分辨率（1 960*544； 2 1920*1080）
 };
 

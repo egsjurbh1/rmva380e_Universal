@@ -1,10 +1,10 @@
 /**
  * \file      	RConfig_ConfigMain.c
  * \author    	L.Q.@Lab217.tongji
- * \version   	0.3.2
- * \date      	2013.12.31
+ * \version   	0.3.3
+ * \date      	2014.1.8
  * \brief     	远程配置功能——远程配置通信的网络线程
- * \update      修正写入配置中存在的BUG
+ * \update      
 **/
 
 #include "EE3_common.h"
@@ -16,8 +16,8 @@ extern EE3_CfgStruct g_EE3Cur;//相机运行状态
 extern EE3_StateStruct g_EE3State;
 extern unsigned int	g_IPAddrCurUse;//相机IP
 /**************************************************************************/
-void Read_DataEncoding(EE3_CfgStruct Cfg, EE3_StateStruct state, char *Sendbuf);
-void Write_ConfigData(Uint8 *ee3cfgBuffer);
+static void Read_DataEncoding(EE3_CfgStruct Cfg, EE3_StateStruct state, char *Sendbuf);
+static void Write_ConfigData(Uint8 *ee3cfgBuffer);
 /**************************************************************************/
 
 /**
@@ -244,7 +244,7 @@ void ReceDecOrderSemPort()
  * \			注意：1、参数行顺序不可调整，只能逐行添加。
  * \
 **/
-void Read_DataEncoding(EE3_CfgStruct Cfg, EE3_StateStruct state, char *Sendbuf)
+static void Read_DataEncoding(EE3_CfgStruct Cfg, EE3_StateStruct state, char *Sendbuf)
 {
 	char runmode[5];
 	char cameraip[15];
@@ -328,7 +328,7 @@ void Read_DataEncoding(EE3_CfgStruct Cfg, EE3_StateStruct state, char *Sendbuf)
  * \			注意：
  * \update		13.12.31修正BUG，防止错误的IP地址存入
 **/
-void Write_ConfigData(Uint8 *ee3cfgBuffer)
+static void Write_ConfigData(Uint8 *ee3cfgBuffer)
 {
 	int i, j;
 	static  int     ee3_mode;

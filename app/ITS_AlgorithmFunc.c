@@ -1,30 +1,15 @@
 /**
  * \file      	ITS_AlgorithmFunc.c 
  * \author    	L.Q.@Lab217.tongji
- * \version   	0.2.2
- * \date      	2013.12.17
+ * \version   	0.2.3
+ * \date      	2014.1.8
  * \brief     	智能交通应用——图像处理算法
- * \update                   
+ * \update      代码整理头文件            
 **/
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
 #include "EE3_common.h"
+#include "EE3_ITSAlg.h"
 /************************************************************************************/
-#define HEIGHT			544 //对应ALG_ROW
-#define WIDTH 			960 //ALG_COL
-#define SEG_THR 		25
-#define PER_THR 		50.0 //数车阈值
-#define THRESHOLD1 		30
-#define BAC_READY 		10.0 
-#define BG_THR			15  //建模阈值
-/************************************************************************************/
-#define THRESHOLD1 		30    //判断是前景还是噪声，此值也要斟酌使用，会滤掉一部分前景
-#define THRESHOLD2 		0.08  //车道横向物体占有率，为了滤去非车物
-#define THRESHOLD3 		20    //判定白点数之间间距使用
-#define THRESHOLD4 		10    //车辆行数
-/************************************************************************************/
-/************************************************************************************/
+//外部初始化结构体,内存分配
 extern AlgfuncData 		g_algfuncData;
 extern VDalgfuncData 	g_VDalgfuncData;
 /************************************************************************************/
@@ -35,61 +20,65 @@ extern VDalgfuncData 	g_VDalgfuncData;
  * \			
 **/
 
-void gaussian(Uint8 *b_data, Uint8 *i_data, Float *ww, Float *mean, Float *sd,int yMin, int yMax, int xMin, int xMax) {
-				  Uint32 C = 3, xp, yp, kp, match, movep, k; //高斯分布个数3-5
-				  Float D = 2.5; //正偏差阀值
-				  Float std_init = 0.001;
-				  Float x = 0.08; //学习率0.01-0.5,x从0.01增大，前景更新越快，有模糊点存在，减小效果好
-				  Float p = x * C, mid_data;
-				  Uint32 min_a_index = 1; //min_a_index随意设定值
-				  Float sum_uu, min_a, tmp = 0;
+void gaussian(Uint8 *b_data, Uint8 *i_data, Float *ww, Float *mean, Float *sd,int yMin, int yMax, int xMin, int xMax) 
+{
+	Uint32 C = 3, xp, yp, kp, match, movep, k; //高斯分布个数3-5
+	Float D = 2.5; //正偏差阀值
+	Float std_init = 0.001;
+	Float x = 0.08; //学习率0.01-0.5,x从0.01增大，前景更新越快，有模糊点存在，减小效果好
+	Float p = x * C, mid_data;
+	Uint32 min_a_index = 1; //min_a_index随意设定值
+	Float sum_uu, min_a, tmp = 0;
 
-				  for (yp = yMin; yp < yMax; yp++)
-					  for (xp = xMin; xp < xMax; xp++) {
-						  sum_uu = 1.0; //初始化值
-						  min_a = *ww;
-						  for (kp = 0; kp < C; kp++) {
-							  match = 0;
-							  movep = yp * WIDTH * 3 + xp * 3 + kp;
+  	for (yp = yMin; yp < yMax; yp++)
+  	{
+	  for (xp = xMin; xp < xMax; xp++) 
+	  {
+		  sum_uu = 1.0; //初始化值
+		  min_a = *ww;
+		  for (kp = 0; kp < C; kp++) {
+			  match = 0;
+			  movep = yp * WIDTH * 3 + xp * 3 + kp;
 
-							  tmp = fabs((float) i_data[yp * WIDTH + xp] - mean[movep]);
-							  sum_uu = tmp * tmp;
-							  sd[movep] = D * D * sd[movep];
+			  tmp = fabs((float) i_data[yp * WIDTH + xp] - mean[movep]);
+			  sum_uu = tmp * tmp;
+			  sd[movep] = D * D * sd[movep];
 
-							  if (sum_uu <= sd[movep]) {
-								  match = 1;
-								  ww[movep] = (1 - x) * ww[movep] + x;
-								  p = x / ww[movep];
-								  mean[movep] = (1 - p) * mean[movep]
-								  + p * (Float) i_data[yp * WIDTH + xp];
-								  mid_data = ((Float) i_data[yp * WIDTH + xp] - mean[movep])
-									  * ((Float) i_data[yp * WIDTH + xp] - mean[movep]);
-								  sd[movep] = sqrt(
-									  (1 - p) * sd[movep] * sd[movep] + p * mid_data);
-							  } else {
-								  ww[movep] = (1 - x) * ww[movep];
-								  mean[movep] = (1 - p) * mean[movep];
-							  }
+			  if (sum_uu <= sd[movep]) {
+				  match = 1;
+				  ww[movep] = (1 - x) * ww[movep] + x;
+				  p = x / ww[movep];
+				  mean[movep] = (1 - p) * mean[movep]
+				  + p * (Float) i_data[yp * WIDTH + xp];
+				  mid_data = ((Float) i_data[yp * WIDTH + xp] - mean[movep])
+					  * ((Float) i_data[yp * WIDTH + xp] - mean[movep]);
+				  sd[movep] = sqrt(
+					  (1 - p) * sd[movep] * sd[movep] + p * mid_data);
+			  } else {
+				  ww[movep] = (1 - x) * ww[movep];
+				  mean[movep] = (1 - p) * mean[movep];
+			  }
 
-							  if (match == 0) {
-								  min_a = ww[movep - kp];
-								  min_a_index = 0;
+			  if (match == 0) {
+				  min_a = ww[movep - kp];
+				  min_a_index = 0;
 
-								  for (k = 1; k < C; k++) {
-									  if (min_a >= ww[movep - kp + k]) {
-										  min_a = ww[movep - kp + k];
-										  ww[movep - kp + k] = ww[movep - kp + k - 1];
-										  ww[movep - kp + k - 1] = min_a;
-									  }
-									  min_a_index = k - 1;
-								  }
-								  mean[movep - kp + min_a_index] = i_data[yp * WIDTH + xp];
-								  sd[movep - kp + min_a_index] = std_init;
-							  }
-						  }
-						  *(b_data + yp * WIDTH + xp) = (Uint8) mean[movep];
-						  //*(i_data + yp * WIDTH + xp) = (Uint8) mean[movep];
+				  for (k = 1; k < C; k++) {
+					  if (min_a >= ww[movep - kp + k]) {
+						  min_a = ww[movep - kp + k];
+						  ww[movep - kp + k] = ww[movep - kp + k - 1];
+						  ww[movep - kp + k - 1] = min_a;
 					  }
+					  min_a_index = k - 1;
+				  }
+				  mean[movep - kp + min_a_index] = i_data[yp * WIDTH + xp];
+				  sd[movep - kp + min_a_index] = std_init;
+			  }
+		  }
+		  *(b_data + yp * WIDTH + xp) = (Uint8) mean[movep];
+		  //*(i_data + yp * WIDTH + xp) = (Uint8) mean[movep];
+	  }
+	}
 }
 
 /**
@@ -100,15 +89,16 @@ void gaussian(Uint8 *b_data, Uint8 *i_data, Float *ww, Float *mean, Float *sd,in
  * \            2、
 **/
 
-void setwwmeansd(Float *ww, Float *mean, Float *sd) {
- int i,j,k;
- for (i = 0; i < 544; i++)  //初始化
-    for (j = 0; j < 960; j++)
-       for (k = 0; k < 3; k++) {
-	        *(ww +  960 * i * 3 + j * 3 + k) = 0.33333;
-	        *(sd + 960 * i * 3 + j * 3 + k) = 6;
-	        *(mean + 960 * i * 3 + j * 3 + k) = 40;
- }
+void setwwmeansd(Float *ww, Float *mean, Float *sd) 
+{
+	int i,j,k;
+	for (i = 0; i < 544; i++)  //初始化
+    	for (j = 0; j < 960; j++)
+       		for (k = 0; k < 3; k++) {
+	        	*(ww +  960 * i * 3 + j * 3 + k) = 0.33333;
+	        	*(sd + 960 * i * 3 + j * 3 + k) = 6;
+	       	 	*(mean + 960 * i * 3 + j * 3 + k) = 40;
+ 			}
 }
 
 /************************************************************************************/
@@ -212,7 +202,8 @@ int GrayscaleQD(Uint8 *back_data, Uint8 *in_data, DpPoint *pt, Uint32 *firstip, 
 /********************************************************
 ****************车辆检测图像处理算法*********************
 ********************************************************/
-void GaussianPram(Float *nMat, int k) {
+void GaussianPram(Float *nMat, int k) 
+{
 	Int s = (k + 1) / 2, m, n;
 	Float bMat = 0.0;
 	Float sMat = 0.0;
@@ -240,7 +231,8 @@ yMax	in
 xMin	in
 xMax	in
 *************************/
-float Percent(Uint8 *f_data, int yMin, int yMax, int xMin, int xMax) {
+static float Percent(Uint8 *f_data, int yMin, int yMax, int xMin, int xMax) 
+{
 	int i, j;
 	int fo = 0;
 	int total = (yMax - yMin) * (xMax - xMin);
@@ -269,7 +261,8 @@ yMax	in
 xMin	in
 xMax	in
 *************************/
-void erosion(Uint8 *data, int yMin, int yMax, int xMin, int xMax, int mMat) {
+static void erosion(Uint8 *data, int yMin, int yMax, int xMin, int xMax, int mMat) 
+{
 	int i, j, flag, m, n;
 	int center = mMat / 2;
 	Uint8 *tmpdata;
@@ -302,7 +295,8 @@ void erosion(Uint8 *data, int yMin, int yMax, int xMin, int xMax, int mMat) {
 	} // for i
 	//free(tmpdata);
 }
-void dilation(Uint8 *data, int yMin, int yMax, int xMin, int xMax, int mMat) {
+static void dilation(Uint8 *data, int yMin, int yMax, int xMin, int xMax, int mMat) 
+{
 	int i, j, flag, m, n;
 	int center = mMat / 2;
 	Uint8 *tmpdata;
@@ -348,9 +342,10 @@ yMax	in
 xMin	in
 xMax	in
 *************************/
-void ForeGround(Uint8 *in_data, Uint8 *back_data, Uint8 *f_data, int yMin,
-		int yMax, int xMin, int xMax) {
-	Int i, j;
+static void ForeGround(Uint8 *in_data, Uint8 *back_data, Uint8 *f_data, int yMin,
+		int yMax, int xMin, int xMax) 
+{
+	int i, j;
 
 	for (i = yMin; i < yMax; i++)
 		for (j = xMin; j < xMax; j++) {
@@ -376,7 +371,8 @@ k		in	帧数
 
 返回值	高斯滤波后的百分比
 *************************/
-float GaussianFilter(float *tempPercent, float *nMat, int k) {
+static float GaussianFilter(float *tempPercent, float *nMat, int k) 
+{
 	float Gaus_percent = 0.0;
 	int i;
 
@@ -398,12 +394,13 @@ xMax		in
 
 diff_point	out	前景背景不同的点数
 *************************/
-void AbsDiff(Uint8 *pro_imgback, Uint8 *b_data, int yMin, int yMax, int xMin,
-		int xMax, int *diff_point) {
+static void AbsDiff(Uint8 *pro_imgback, Uint8 *b_data, int yMin, int yMax, int xMin,
+		int xMax, int *diff_point) 
+{
 	int yp, xp;
 	*diff_point = 0;
-	for (yp = yMin; yp < yMax; yp++)
-		for (xp = xMin; xp < xMax; xp++) {
+	for(yp = yMin; yp < yMax; yp++)
+		for(xp = xMin; xp < xMax; xp++) {
 			if (abs(
 					*(b_data + yp * WIDTH + xp)
 							- (*(pro_imgback + yp * WIDTH + xp))) > SEG_THR) {
@@ -423,8 +420,9 @@ xMin		in
 xMax		in
 
 *************************/
-void memcpy_area(Uint8 *src, Uint8 *dest, int yMin, int yMax, int xMin,
-		int xMax) {
+static void memcpy_area(Uint8 *src, Uint8 *dest, int yMin, int yMax, int xMin,
+		int xMax) 
+{
 	int yp, xp;
 	for (yp = yMin; yp < yMax; yp++)
 		for (xp = xMin; xp < xMax; xp++) {
@@ -460,8 +458,8 @@ numofframe       in  背景建模频率
 
 *************************/			
 int GrayscaleVD(Uint8 *in_data, float *ww, float *mean, float *sd, DpPoint *ptP,
-		 Uint8 *ptn, Uint8 *carNum,	float *nMat, Uint8 *back_data,	Uint8 numofframe) {
-
+		 Uint8 *ptn, Uint8 *carNum,	float *nMat, Uint8 *back_data,	Uint8 numofframe) 
+{
 	static Uint8 count = 0;
 	static Uint8 iStart = 0;
 	static Uint8 framesTemp = 0;

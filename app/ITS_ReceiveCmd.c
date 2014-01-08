@@ -1,24 +1,15 @@
 /**
  * \file      	ITS_ReceiveCmd.c
  * \author    	L.Q.@Lab217.tongji
- * \version   	0.1.0
- * \date      	2013.12.30
+ * \version   	0.1.1
+ * \date      	2014.1.8
  * \brief     	智能交通应用——接收红绿灯控制器控制信号的网络线程
  * \            与UDP_Client_CMDMonitor.exe测试通信使用
- * \update		修正连接逻辑
+ * \update		代码整理头文件
 **/
 
 #include "EE3_common.h"
-/**************************************************************************/
-//外部变量
-extern PcInData     g_BpInputData;
-extern PcInData 	g_BpOutputData1;
-extern PcInData 	g_BpOutputData2;
-extern AcmdSem 		g_AmcdSem1;
-extern AcmdSem 		g_AmcdSem2;
-extern EE3_CfgStruct g_EE3Cur;//相机运行状态
-extern CmdUData g_CmdUdata;
-extern volatile    int   bText;
+#include "EE3_Imgmain.h"
 /**************************************************************************/
 
 /**
@@ -124,7 +115,6 @@ void ReceBpStartSemPort()
 			     		break;
 					}
 					bSendDp1=FALSE;
-					//bText全局变量测试sendto是否成功
 				}
 				if(bSendDp2)
 				{
