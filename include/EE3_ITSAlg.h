@@ -28,15 +28,15 @@
 #define THRESHOLD4 		10    //车辆行数
 
 //高斯背景建模
-extern void gaussian(Uint8 *b_data, Uint8 *i_data, float *ww, float *mean, float *sd,int yMin, int yMax, int xMin, int xMax);
+void gaussian(Uint8 *b_data, Uint8 *i_data, float *ww, float *mean, float *sd,int yMin, int yMax, int xMin, int xMax);
 //高斯背景建模算法中所需的初始化函数
-extern void setwwmeansd(Float *ww, Float *mean, Float *sd);
-extern void GaussianPram(Float *nMat, int k);
+void setwwmeansd(Float *ww, Float *mean, Float *sd);
+void GaussianPram(Float *nMat, int k);
 //车辆检测
-extern int GrayscaleVD(Uint8 *in_data, float *ww, float *mean, float *sd, DpPoint *ptP,
+int GrayscaleVD(Uint8 *in_data, float *ww, float *mean, float *sd, DpPoint *ptP,
 		 Uint8 *ptn, Uint8 *carNum,	float *nMat, Uint8 *back_data,	Uint8 numofframe);
 //队长检测
-extern int GrayscaleQD(Uint8 *back_data,Uint8 *in_data,DpPoint *pt,Uint32 *firstip,Uint32 *lastip);
+int GrayscaleQD(Uint8 *back_data,Uint8 *in_data,DpPoint *pt,Uint32 *firstip,Uint32 *lastip);
 
 
 #endif

@@ -5,7 +5,7 @@
 ;; INPUT EE3.cdb
 
 ;; CONFIGURATION/VERSION INFORMATION
-	.asg "Thu Jan 02 09:32:07 2014", VERS$DATE
+	.asg "Wed Jan 15 10:32:50 2014", VERS$DATE
 
 ;; PROLOGUE
 	.include EE3cfg.h62
@@ -77,7 +77,7 @@ LOG$NUMOF           .set 2
 LOG$SETOF           .set 00H
 PIP$NUMOF           .set 0
 PIP$SETOF           .set 00H
-SEM$NUMOF           .set 17
+SEM$NUMOF           .set 18
 SEM$SETOF           .set 00H
 MBX$NUMOF           .set 0
 MBX$SETOF           .set 00H
@@ -2420,6 +2420,14 @@ HOOK$SETOF          .set 00H
 	.global sem_SendRoadInfReady
 	.asg 00H, _iCount
 	SEM_Obj 1, sem_SendRoadInfReady, 0, _iCount
+
+;; ======== SEM_Obj sem_SendRoadInfReconnect ========
+;; <add comments here>
+;;
+;; SEM_Obj sem_SendRoadInfReconnect (iCount)
+	.global sem_SendRoadInfReconnect
+	.asg 00H, _iCount
+	SEM_Obj 1, sem_SendRoadInfReconnect, 0, _iCount
 
 ;; ======== STS_Obj IDL_busyObj ========
 ;; This object is required by the system to accumulate CPU load statistics

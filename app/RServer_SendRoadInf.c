@@ -1,10 +1,10 @@
 /**
  * \file      	RServer_SendRoadInf.c
  * \author    	L.Q.@Lab217.tongji
- * \version   	0.0.4
- * \date      	2013.12.17
+ * \version   	0.1.0
+ * \date      	2014.1.15
  * \brief     	向远程服务器发送消息功能——发送车辆检测数据的网络线程
- * \update      
+ * \update      修复线程同步BUG
 **/				
 
 #include "EE3_common.h"
@@ -30,7 +30,9 @@ void SendRoadInfPort()
 	Uint32 t_start, t_end;
 	
 	while(1)
-	{			    			    
+	{			    			      	
+    	//等待信号同步
+    	SEM_pend(&sem_SendRoadInfReconnect,SYS_FOREVER);
     	//为当前任务配置运行环境
 		fdOpenSession( TaskSelf() );
 		//套接字socket对象,TCP协议
@@ -59,15 +61,20 @@ void SendRoadInfPort()
 		{
          	//如果连接出错则关闭接受到的连接对象，重新尝试
 		 	fdClose(sockTCPsendroadinf);
+			
 		 	continue;
 		}
+		//连接成功标记
+		g_bIsSendRoadInfConnect = TRUE;
+		SEM_reset( &sem_SendRoadInfReconnect, 0 );
+
 		//IP地址信息存入
 		strcpy(info[0].local_ip, g_EE3Cur.CameraIp);
 		strcpy(info[1].local_ip, g_EE3Cur.CameraIp);
 		
 		//循环计时
 		t_start =  Roseek_GetTickCount();
-		g_bIsSendRoadInfConnect = TRUE;
+
 		while(1)
 		{						
     		SEM_pend(&sem_SendRoadInfReady,SYS_FOREVER);
@@ -103,3 +110,7 @@ void SendRoadInfPort()
 									
 	}
 }
+
+
+
+

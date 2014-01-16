@@ -2,5 +2,5 @@
 # This file contains tconf options for file "EE3.tcf",
 # for use by the Gconf graphical configuration tool.
 # The options are exported from the following CCS project: 
-# E:\Lab217\EagleEye3\DEMO\380E\rmva380e_Universal\rmva380e.pjt, "Release" configuration.
+# E:\Lab217\EagleEye3\DEMO\380E\rmva380e_Universal\rmva380e.pjt, "Debug" configuration.
 -Dconfig.importPath="C:\CCStudio_v3.3\bios_5_41_04_18\packages;"

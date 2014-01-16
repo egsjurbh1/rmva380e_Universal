@@ -46,6 +46,7 @@ extern far SEM_Obj sem_DecClientReady;
 extern far SEM_Obj sem_CmdDataReady;
 extern far SEM_Obj sem_UdplistenReady;
 extern far SEM_Obj sem_SendRoadInfReady;
+extern far SEM_Obj sem_SendRoadInfReconnect;
 extern far STS_Obj IDL_busyObj;
 
 

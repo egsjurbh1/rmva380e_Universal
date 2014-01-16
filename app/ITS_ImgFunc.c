@@ -1,8 +1,8 @@
 /**
  * \file      	ITS_ImgFunc.c 
  * \author    	L.Q.@Lab217.tongji
- * \version   	0.0.1
- * \date      	2014.1.8
+ * \version   	0.1.0
+ * \date      	2014.1.15
  * \brief     	图像处理线程用到的一些函数
  * \update      
 **/
@@ -77,12 +77,13 @@ void PointDataConfig(DpPoint *pt, int *pointdata)
  * \					
  * \			1、虚拟线框配置数据(分VD和QD两个线框)
  * \            2、车道编号配置数据
+ * \update		增加读取判断2014.1.15
 **/
 
 void ReadPointDataFromFlash()
 {
 	int 	i,j,k,n;
-	char 	background[2][80];
+	char 	background[2][81];
 	char    tmpNum[3] = {0,0,0};
 	//从FLASH中读取虚拟线框配置
 	Roseek_Flash_Read((Uint8 *)background[0],CFGVDPOINTADD,80);//车辆检测VD框
@@ -92,6 +93,8 @@ void ReadPointDataFromFlash()
 	k=0;
 	for(i=0;i<2;i++)
 	{
+		if(background[i][79] != 0x55)
+			continue;
 		for(n=0;n<80;n++){
 			if(background[i][n]>='0'&&background[i][n]<='9'){//数字转存
 			 	tmpNum[j]=10*tmpNum[j]+(background[i][n] - '0');//char转整型数
@@ -223,7 +226,7 @@ static Bool DecodingCfgData(char *bufstream, int wordnum, char word[][30])
  * \					
  * \			1、Flash起始地址CFGCOMMONADD存储当前运行状态
  * \            2、Flash起始地址CFGVDADD存储车辆检测配置，Flash起始地址CFGQDADD存储队长检测配置
- * \update      13.12.31修正BUG
+ * \update		增加读取判断2014.1.15
 **/
 void ReadSetInfFormFlash(Bool isReadflash)
 {
@@ -249,27 +252,37 @@ void ReadSetInfFormFlash(Bool isReadflash)
 			//解析配置数据
 			g_EE3Cur.RunMode = ee3mode;
 			//通用配置
-			decodefail[0] = DecodingCfgData(Sdata, n1, word);
-			if(decodefail[0] == TRUE)
+			if(Sdata[79] == 0x55)//已写入标记判断
 			{
-				strcpy(g_EE3Cur.CameraIp, word[0]);
-				strcpy(g_EE3Cur.ServerIp, word[1]);
-				g_EE3Cur.ServerPort = (Uint16)(StringConvertInt(word[2]));
+				decodefail[0] = DecodingCfgData(Sdata, n1, word);
+				if(decodefail[0] == TRUE)
+				{
+					strcpy(g_EE3Cur.CameraIp, word[0]);
+					strcpy(g_EE3Cur.ServerIp, word[1]);
+					g_EE3Cur.ServerPort = (Uint16)(StringConvertInt(word[2]));
+				}
+			}
+			if(scfgtmpVD[29] == 0x55)//已写入标记判断
+			{
+				decodefail[1] = DecodingCfgData(scfgtmpVD, n2, word);
+				if(decodefail[1] == TRUE)
+				{
+					g_EE3Cur.UploadTime = StringConvertInt(word[0]);
+					g_EE3Cur.NightTrafficStream = StringConvertInt(word[1]);
+				}
 			}
 			//车辆检测配置
-			decodefail[1] = DecodingCfgData(scfgtmpVD, n2, word);
-			if(decodefail[1] == TRUE)
-			{
-				g_EE3Cur.UploadTime = StringConvertInt(word[0]);
-				g_EE3Cur.NightTrafficStream = StringConvertInt(word[1]);
-			}	
+			if(scfgtmpQD[29] == 0x55)//已写入标记判断
+			{	
 			//队长检测配置
-			decodefail[2] = DecodingCfgData(scfgtmpQD, n2, word);	
-			if(decodefail[2] == TRUE)
-			{		
-				g_EE3Cur.RoadNum[0] = StringConvertInt(word[0]);
-				g_EE3Cur.RoadNum[1] = StringConvertInt(word[1]);
+				decodefail[2] = DecodingCfgData(scfgtmpQD, n2, word);	
+				if(decodefail[2] == TRUE)
+				{		
+					g_EE3Cur.RoadNum[0] = StringConvertInt(word[0]);
+					g_EE3Cur.RoadNum[1] = StringConvertInt(word[1]);
+				}
 			}
+
 			if((decodefail[0] && decodefail[1] && decodefail[2]) == TRUE)
 			{
 				g_EE3Cur.Isreadflash = 1;//读取配置成功
@@ -485,5 +498,39 @@ void ResetPointData()
 	for(i=0; i<16; i++)
 		PointDataQD[i] = 0;
 
+}
+
+/************************************************************************************/
+/**
+ * \function 	SendSemCycle
+ * \brief    	周期性发送信号量
+ **/
+void SendSemCycle()
+{
+	Uint8   RTC_time[8];
+	static  Uint8 temp_min = 0;
+	static  Uint8 temp_hour = 0;
+	
+	Roseek_RTC_ReadTime(RTC_time);//当前系统时间
+	if(RTC_time[5]>temp_min)
+	{
+		if(RTC_time[5]-temp_min > CONNECT_CYCLE)
+		{	
+			temp_min = RTC_time[5];
+			temp_hour = RTC_time[4];
+			SEM_post( &sem_SendRoadInfReconnect );//通知连接服务器信号量
+			
+		}							
+	}
+	else
+	{
+		if( temp_min < (60 - CONNECT_CYCLE) || temp_hour != RTC_time[4])
+		{	
+			temp_min = RTC_time[5] ;
+			temp_hour = RTC_time[4] ;
+			SEM_post( &sem_SendRoadInfReconnect );//通知连接服务器信号量
+			
+		}
+	}
 }
 

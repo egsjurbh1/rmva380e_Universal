@@ -111,7 +111,7 @@ type GlobalStatus {
         prop Visible :: 0
         prop Writable :: 1
     }
-    global DATE :: "Thu Jan 02 09:32:07 2014" { 
+    global DATE :: "Wed Jan 15 10:32:50 2014" { 
         prop Type :: "{21455EA3-B96A-11cf-9BFE-0000C0AC14C7}"
         prop Visible :: 0
         prop Writable :: 0
@@ -8260,7 +8260,7 @@ type SEM {
         prop Writable :: 0
         prop NoGen :: 1
     }
-    global gNumOf :: 17 { 
+    global gNumOf :: 18 { 
         prop Visible :: 0
         prop Writable :: 0
         prop NoGen :: 1
@@ -10744,6 +10744,15 @@ object sem_UdplistenReady :: SEM {
 }
 
 object sem_SendRoadInfReady :: SEM {
+    param iComment :: "<add comments here>"
+    param iIsUsed :: 1
+    param iId :: 0
+    param iDelUser :: "USER"
+    param iDelMsg :: "ok"
+    param iCount :: 0
+}
+
+object sem_SendRoadInfReconnect :: SEM {
     param iComment :: "<add comments here>"
     param iIsUsed :: 1
     param iId :: 0

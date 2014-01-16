@@ -1,10 +1,10 @@
 /**
  * \file      	RConfig_ConfigMain.c
  * \author    	L.Q.@Lab217.tongji
- * \version   	0.3.3
- * \date      	2014.1.8
+ * \version   	0.3.4
+ * \date      	2014.1.15
  * \brief     	远程配置功能——远程配置通信的网络线程
- * \update      
+ * \update      写入Flash标记
 **/
 
 #include "EE3_common.h"
@@ -135,6 +135,8 @@ void ReceDecOrderSemPort()
 				     	bIsError = TRUE;
 				     	break;
 					 }
+					 //末尾标记已写入
+					 pointBuffer[79] = 0x55;
 					 //数据存入FLASH
 					 switch(g_EE3Cur.RunMode)
 					 {
@@ -185,7 +187,7 @@ void ReceDecOrderSemPort()
 						bIsError = TRUE;
                      	break;
 					 }
-					 //写入配置数据
+					 //写入配置数据			 
 					 Write_ConfigData(ee3cfgBuffer);
 					 //反馈信息
 					 reply.command = EE3_SETCONFIG;
@@ -389,14 +391,18 @@ static void Write_ConfigData(Uint8 *ee3cfgBuffer)
 		//修改相机的IP地址
 		Roseek_Save_IP_Address( tempIP );
 	}
+	//末尾标记已写入
+	scommonmode[79] = 0x55;
 	//写入Flash
 	Roseek_Flash_Burn((Uint8 *)scommonmode,CFGCOMMONADD,80);//存储通用配置信息
 	switch(ee3_mode)
 	{
 		case VEHICLE_DETECT:
+			sfmode[29] = 0x55;//末尾标记已写入
 			Roseek_Flash_Burn((Uint8 *)sfmode,CFGVDADD,30);
 			break;
 		case QUEUE_DETECT:
+			sfmode[29] = 0x55;//末尾标记已写入
 			Roseek_Flash_Burn((Uint8 *)sfmode,CFGQDADD,30);
 			break;
 		case TEST_MODE:

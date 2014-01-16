@@ -287,21 +287,22 @@ static void EE3_NetworkClose()
 	TaskDestroy( hSend_LiveStream_Another );
 
 	//自主网络线程
-
+	
 	fdCloseSession( hRece_BpSem );
 	TaskDestroy( hRece_BpSem );
 
-	fdCloseSession( hUDP_Sem );
-	TaskDestroy( hUDP_Sem );
-
-	fdCloseSession( hReceDecO_Sem );
-	TaskDestroy( hReceDecO_Sem );
-
-	fdCloseSession( hSend_FcontoDec_Sem );
-	TaskDestroy( hSend_FcontoDec_Sem );
-
-	fdCloseSession( hSend_roadinfo_Sem );
-	TaskDestroy( hSend_roadinfo_Sem );
+	fdCloseSession( hUDP_Sem );         
+ 	TaskDestroy( hUDP_Sem );               
+                                        
+ 	fdCloseSession( hReceDecO_Sem );       
+ 	TaskDestroy( hReceDecO_Sem );          
+                                         
+ 	fdCloseSession( hSend_FcontoDec_Sem ); 
+ 	TaskDestroy( hSend_FcontoDec_Sem );    
+                                         
+ 	fdCloseSession( hSend_roadinfo_Sem );  
+ 	TaskDestroy( hSend_roadinfo_Sem );	   
+	
 }
 
 

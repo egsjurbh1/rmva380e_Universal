@@ -330,6 +330,7 @@ bios.MEM.instance("DDR2").len = 0x20000000;
 bios.MEM.instance("DDR2").heapSize = 0x1d000000;
 bios.TSK.instance("tskAcmdBDmain").fxn = prog.extern("tskImgmainFunc");
 bios.SEM.create("sem_SendRoadInfReady");
+bios.SEM.create("sem_SendRoadInfReconnect");
 // !GRAPHICAL_CONFIG_TOOL_SCRIPT_INSERT_POINT!
 
 prog.gen();

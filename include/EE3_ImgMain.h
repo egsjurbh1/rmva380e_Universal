@@ -5,8 +5,8 @@
 /**
  * \file      	EE3_ImgMain.h
  * \author    	LQ
- * \version   	0.05
- * \date      	2012.12.1
+ * \version   	0.1.0
+ * \date      	2014.1.16
  * \brief     	EE3_ImgMain中的全局变量。
  *              ！更新：
 **/
@@ -33,7 +33,7 @@ extern volatile Bool IsReadFlash;
 extern EE3_CfgStruct 	g_EE3Cur;//相机运行状态
 extern CmdUData 		g_CmdUdata;
 //函数
-extern void EE3_YUV2YCrCb420( Uint8*, Uint8*, Uint8*, Uint8*, Uint32, Uint32 );
+void EE3_YUV2YCrCb420( Uint8*, Uint8*, Uint8*, Uint8*, Uint32, Uint32 );
 
 #endif
 

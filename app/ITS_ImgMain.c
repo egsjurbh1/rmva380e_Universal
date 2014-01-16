@@ -1,10 +1,10 @@
 /**
  * \file      	ITS_ImgMain.c 
  * \author    	L.Q.@Lab217.tongji
- * \version   	0.3.5
- * \date      	2014.1.8
+ * \version   	0.3.6
+ * \date      	2014.1.15
  * \brief     	ÖÇÄÜ½»Í¨Ó¦ÓÃ----Í¼Ïñ´¦ÀíÖ÷Ïß³Ì(³µÁ¾¼ì²â¹¦ÄÜ¡¢¶ÓÁÐ³¤¶È¼ì²â¹¦ÄÜ)
- * \update      ´úÂëÕûÀíÍ·ÎÄ¼þ
+ * \update      ¼ÓÈëºÍsendroadinfÏß³ÌÍ¬²½ÐÅºÅÂß¼­
 **/
 
 #include "EE3_common.h"
@@ -128,6 +128,10 @@ void tskImgmainFunc()
 				if(g_bIsSendRoadInfConnect)
 				{
 					SEM_post( &sem_SendRoadInfReady );//Í¨Öª·¢ËÍÊý¾ÝÐÅºÅÁ¿
+				}
+				else
+				{					
+					SendSemCycle();//Ã¿¸ôÒ»¶ÎÊ±¼ä·¢Á¬½ÓÐÅºÅ
 				}
 				break;
 			//¶Ó³¤¼ì²â
@@ -262,7 +266,7 @@ static void ITS_QueueDetect(DpPoint *dpPQD)
 				//"ºì×ªÂÌ"×´Ì¬,¼¤»î±³¾°½¨Ä£
 	            case NETINFORTG:
 	            	pui8BFrameBufY2 = g_ImgBufofBackS2.pui8YCrCb_YBuf;//±³¾°½¨Ä£»ñµÃµÄ±³¾°Í¼ÏñY·ÖÁ¿    	          		             	
-		            //µ÷ÓÃ±³¾°½¨Ä£Ëã·¨
+		            //µ÷ÓÃ±³¾°¨Ä£Ëã·¨
                     gaussian(pui8BFrameBufY2, pui8inFrameBufY, 
                     	g_bpalgData2.ww, g_bpalgData2.mean, g_bpalgData2.sd, 
                     	(dpPQD + 1)->yMin, (dpPQD + 1)->yMax, (dpPQD + 1)->xMin, (dpPQD + 1)->xMax );
